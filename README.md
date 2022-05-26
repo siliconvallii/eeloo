@@ -70,12 +70,12 @@ git push origin feature/AmazingFeature
 5. open a pull request
 
 <!-- LICENSE -->
-## License
+## license
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+distributed under the MIT license. see `LICENSE.txt` for more information.
 
 <!-- CONTACT -->
-## Contact
+## contact
 
 Filippo Valli
 
