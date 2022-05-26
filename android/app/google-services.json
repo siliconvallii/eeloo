@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "732552491920",
+    "firebase_url": "https://eeloo-579a4-default-rtdb.firebaseio.com",
+    "project_id": "eeloo-579a4",
+    "storage_bucket": "eeloo-579a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:732552491920:android:a1d5d37eef8838bf1cf915",
+        "android_client_info": {
+          "package_name": "it.produzionisiliconesi.eeloo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "732552491920-qcl6bfepfltv8c0ons9k368e41lqpgom.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "it.produzionisiliconesi.eeloo",
+            "certificate_hash": "7ab3f52f8101a011e64fbc228c1e13726a29001c"
+          }
+        },
+        {
+          "client_id": "732552491920-e4hn4n6tieqatlqarscjk7hb7a13ua1d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "API KEY HERE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "732552491920-e4hn4n6tieqatlqarscjk7hb7a13ua1d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "732552491920-g8ldge1tp65757dea7jsqtvru850sclp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "it.produzionisiliconesi.eeloo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
