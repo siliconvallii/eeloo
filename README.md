@@ -14,7 +14,11 @@
 <!-- ABOUT THE PROJECT -->
 ## about the project
 
-since social networks are widely spread in society, we can't trust big companies to control how we communicate and interact with news and data. as open-source messaging app are becoming a valuable alternative, social networks must follow up. eeloo aims at providing an open-source, private and reliable social-network, giving top importance at keeping close friends in touch.
+since social networks are widely spread in society, we can't trust big companies to control how we communicate and interact with news and data. as open-source messaging app are becoming more and more popular, social networks must follow up. eeloo aims at providing an open-source, private and reliable social-network, giving top importance at keeping close friends in touch.
+
+### state of the project
+
+eeloo is currently available on [Apple Store](https://apps.apple.com/fi/app/eeloo/id1606031375) and [Play Store](https://play.google.com/store/apps/details?id=it.produzionisiliconesi.eeloo): since it currently is in early-access, it is reserved to the students of four high-schools. eeloo will be expanding its userbase accordingly to the state of the project.
 
 ### built with
 
@@ -33,8 +37,7 @@ to contribute to this project, you can easily set-up eeloo locally and start cod
 
 ### prerequisites
 
-make sure to have Flutter installed on your device. check official docs <a href="https://docs.flutter.dev/get-started/install">here</a>.
-
+make sure to have Flutter installed on your device. check official docs [here](https://docs.flutter.dev/get-started/install).
 ### installation
 
 1. clone the repo
@@ -45,7 +48,7 @@ make sure to have Flutter installed on your device. check official docs <a href=
    ```sh
    flutter pub get
    ```
-3. implement your own Firebase project for both iOS and Android. check official docs <a href="https://firebase.google.com/docs">here</a>.
+3. implement your own Firebase project for both iOS and Android. check official docs [here](https://firebase.google.com/docs).
 
 <!-- CONTRIBUTING -->
 ## contributing
