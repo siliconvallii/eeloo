@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eeloo/data/data.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:uuid/uuid.dart';
+import 'package:eeloo/providers/upload_image.dart';
 
 Future updateProfile(Map<String, dynamic> updatedProfile) async {
   // Instanciate reference of Cloud Firestore
@@ -29,23 +28,9 @@ Future updateProfile(Map<String, dynamic> updatedProfile) async {
   }
 
   if (updatedProfile['profile_picture'] != null) {
-    // Generate image ID
-    String imageId = const Uuid().v4();
-
-    // instatiate reference of Firebase Storage
-    Reference reference = FirebaseStorage.instance.ref().child(imageId);
-
-    // Upload image to Firebase Storage
-    await reference.putFile(updatedProfile['profile_picture']);
-
-    // Fetch image URL
-    String profilePictureUrl = '';
-    await reference
-        .getDownloadURL()
-        .then((String _imageURL) => profilePictureUrl = _imageURL);
-
-    // Store link
-    updatedProfile['profile_picture'] = profilePictureUrl;
+    // Upload image and fetch image URL
+    updatedProfile['profile_picture'] =
+        await uploadImage(updatedProfile['profile_picture']);
   }
 
   // Update user's data to UIDS collection
