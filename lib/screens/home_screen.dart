@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       List searchedUsersUids = [];
       List searchedUsersEssentialData = [];
 
-      await firestore.collection('usernames').limit(10).get().then(
+      await firestore.collection('usernames').get().then(
         (QuerySnapshot querySnapshot) async {
           for (QueryDocumentSnapshot username in querySnapshot.docs) {
             if (username.id.contains(searchedUsername)) {
