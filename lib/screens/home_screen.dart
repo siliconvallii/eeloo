@@ -1,19 +1,15 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eeloo/providers/fetch_user_data.dart';
-import 'package:eeloo/screens/profile_screen.dart';
-import 'package:eeloo/services/banner_ad_service.dart';
+import 'package:eeloo/screens/new_chat_screen.dart';
 import 'package:eeloo/widgets/expired_chat_card.dart';
+import 'package:eeloo/widgets/searched_user_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:eeloo/data/data.dart';
 import 'package:eeloo/providers/fetch_chats.dart';
 import 'package:eeloo/screens/my_profile_screen.dart';
-import 'package:eeloo/widgets/start_chat_button.dart';
 import 'package:eeloo/widgets/user_has_to_reply_card.dart';
 import 'package:eeloo/widgets/user_replied_card.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -23,10 +19,76 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isSearching = false;
+  void _searchUser(String searchedUsername) async {
+    // Check if searchedUsername is at least 2 characters long
+    if (searchedUsername.length < 2) {
+      // searchedUsername is less of 2 characters long
+      // Don't fetch users
+      setState(() {
+        _usersList = [];
+        _isLoading = false;
+      });
 
+      // Shut down function
+      return;
+    }
+
+    // Show loading indicator
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Set a delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (_searchController.text == searchedUsername) {
+      // Instanciate reference of Cloud Firestore
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+      // Find users with username
+      List searchedUsersUids = [];
+      List searchedUsersEssentialData = [];
+
+      await firestore.collection('usernames').limit(10).get().then(
+        (QuerySnapshot querySnapshot) async {
+          for (QueryDocumentSnapshot username in querySnapshot.docs) {
+            if (username.id.contains(searchedUsername)) {
+              dynamic _user = username.data();
+              searchedUsersUids.add(_user['uid']);
+            }
+          }
+        },
+      );
+
+      // Check if result isn't empty
+      if (searchedUsersUids.isNotEmpty) {
+        for (String uid in searchedUsersUids) {
+          // Check if user's data is stored locally
+          if (users[uid] == null) {
+            // User's data isn't stored locally
+            // Fetch user's data
+            Map eachUserEssentialData = await fetchUserData(uid);
+
+            // Return user's data
+            searchedUsersEssentialData.add(eachUserEssentialData);
+          } else {
+            // User's data is stored locally
+            // Return user's data
+            searchedUsersEssentialData.add(users[uid]);
+          }
+        }
+      }
+
+      // Return users List and delete loading indicator
+      setState(() {
+        _usersList = searchedUsersEssentialData;
+        _isLoading = false;
+      });
+    }
+  }
+
+  bool _isSearchingUser = false;
   bool _isLoading = false;
-
   bool _hasToRefresh = true;
 
   final TextEditingController _searchController = TextEditingController();
@@ -43,10 +105,14 @@ class _HomeScreenState extends State<HomeScreen> {
       child: GestureDetector(
         child: Scaffold(
           appBar: AppBar(
-            automaticallyImplyLeading: false,
             actions: [
-              _isSearching
+              // Check if user search is active
+              _isSearchingUser
+                  // User search is active
+                  // Don't show MyProfileScreen's IconButton
                   ? Container()
+                  // User search is not active
+                  // Show MyProfileScreen's IconButton
                   : IconButton(
                       icon: const Icon(Icons.person),
                       onPressed: () {
@@ -60,251 +126,87 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
             ],
-            backgroundColor: const Color(0xff2E2E2E),
-            centerTitle: true,
-            elevation: 0,
+            // User search's IconButton
             leading: IconButton(
-              icon: _isSearching
+              // Check if user search is active
+              icon: _isSearchingUser
+                  // User search is active
+                  // Show arrow back Icon
                   ? const Icon(Icons.arrow_back)
+                  // User search is not active
+                  // Show search Icon
                   : const Icon(Icons.search),
-              onPressed: () => setState(() {
-                _searchController.text = '';
-                _usersList = [];
-                _isSearching = !_isSearching;
-                _hasToRefresh = false;
-              }),
+              onPressed: () {
+                setState(() {
+                  // Initialize search TextEditingController
+                  _searchController.text = '';
+                  // Initialize users List
+                  _usersList = [];
+                  // Invert _isSearchingUser
+                  _isSearchingUser = !_isSearchingUser;
+                  // Set _hasToRefresh to false
+                  _hasToRefresh = false;
+                });
+              },
             ),
-            title: _isSearching
+            // AppBar title
+            // Check if user search is active
+            title: _isSearchingUser
+                // User search is active
+                // Search TextField
                 ? TextField(
                     autocorrect: false,
                     controller: _searchController,
-                    cursorColor: const Color(0xffBC91F8),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      counterText: '',
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      hintText: 'username...',
-                      hintStyle: GoogleFonts.alata(
-                        color: Colors.grey,
-                        fontSize: 17,
-                      ),
+                    decoration: const InputDecoration(
+                      hintText: 'username',
                     ),
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(
                         RegExp("[a-z0-9_]"),
                       ),
                     ],
-                    maxLength: 50,
+                    maxLength: 30,
                     maxLines: 1,
-                    onChanged: (searchedUsername) async {
-                      if (searchedUsername.length > 1) {
-                        setState(() {
-                          _isLoading = true;
-                        });
-
-                        await Future.delayed(const Duration(milliseconds: 500));
-                        if (_searchController.text == searchedUsername) {
-                          // search users
-
-                          // instatiate reference of Cloud Firestore
-                          FirebaseFirestore firestore =
-                              FirebaseFirestore.instance;
-
-                          // find users with username
-                          List searchedUsersUids = [];
-                          List searchedUsersEssentialData = [];
-
-                          await firestore.collection('usernames').get().then(
-                            (QuerySnapshot querySnapshot) async {
-                              for (QueryDocumentSnapshot username
-                                  in querySnapshot.docs) {
-                                if (username.id.contains(searchedUsername)) {
-                                  dynamic _user = username.data();
-                                  searchedUsersUids.add(_user['uid']);
-                                }
-                              }
-                            },
-                          );
-
-                          if (searchedUsersUids.isNotEmpty) {
-                            for (var uid in searchedUsersUids) {
-                              if (users[uid] == null) {
-                                // user isn't stored locally
-                                Map eachUserEssentialData =
-                                    await fetchUserData(uid);
-                                searchedUsersEssentialData
-                                    .add(eachUserEssentialData);
-                              } else {
-                                // user is stored locally
-                                searchedUsersEssentialData.add(users[uid]);
-                              }
-                            }
-                          }
-
-                          setState(() {
-                            _usersList = searchedUsersEssentialData;
-                            _isLoading = false;
-                          });
-                        }
-                      } else {
-                        setState(() {
-                          _usersList = [];
-                          _isLoading = false;
-                        });
-                      }
-                    },
+                    onChanged: (username) => _searchUser(username),
                     onSubmitted: (username) {
-                      // dismiss keyboard
+                      // Dismiss keyboard
                       FocusManager.instance.primaryFocus?.unfocus();
                     },
-                    style: GoogleFonts.alata(
-                      color: Colors.white,
-                      fontSize: 17,
-                    ),
                     textInputAction: TextInputAction.search,
                   )
-                : Text(
-                    'eeloo',
-                    style: GoogleFonts.alata(),
-                  ),
+                // User search is not active
+                // Title Text
+                : const Text('eeloo'),
           ),
-          backgroundColor: const Color(0xff121212),
           body: SafeArea(
-            child: _isSearching
+            // Check if user search is active
+            child: _isSearchingUser
+                // Check if Future is loading
                 ? _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xffBC91F8),
-                        ),
-                      )
+                    // Future is loading
+                    // Show CircularProgressIndicator
+                    ? const Center(child: CircularProgressIndicator())
+                    // Future has completed loading
+                    // Check if user List is empty
                     : _usersList.isNotEmpty
+                        // User List is not empty
+                        // User List ListViewBuilder
                         ? ListView.builder(
                             itemCount: _usersList.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return InkWell(
-                                child: Container(
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: CachedNetworkImage(
-                                            fit: BoxFit.fill,
-                                            errorWidget: (BuildContext context,
-                                                    String url,
-                                                    dynamic error) =>
-                                                const Icon(Icons.error),
-                                            imageUrl: _usersList[index]
-                                                ['profile_picture'],
-                                            placeholder: (BuildContext context,
-                                                    String url) =>
-                                                const Center(
-                                              child: CircularProgressIndicator(
-                                                color: Color(0xffBC91F8),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        height: 50,
-                                        width: 50,
-                                      ),
-                                      Expanded(
-                                        child: Container(
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                _usersList[index]['username'],
-                                                overflow: TextOverflow.ellipsis,
-                                                style: GoogleFonts.alata(
-                                                  color: Colors.white,
-                                                  fontSize: 17,
-                                                ),
-                                              ),
-                                            ],
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                          ),
-                                          margin: const EdgeInsets.only(
-                                            left: 10,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        child: Container(
-                                          child:
-                                              const Icon(Icons.arrow_forward),
-                                          decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(10),
-                                            ),
-                                            color: Color(0xffBC91F8),
-                                          ),
-                                        ),
-                                        height: 50,
-                                        width: 50,
-                                      ),
-                                    ],
-                                  ),
-                                  decoration: const BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                    color: Color(0xff1E1E1E),
-                                  ),
-                                  padding: const EdgeInsets.all(10),
-                                  margin: const EdgeInsets.only(
-                                    left: 10,
-                                    right: 10,
-                                    top: 10,
-                                  ),
-                                ),
-                                onTap: () async {
-                                  if (_usersList[index]['uid'] ==
-                                      user['data']['uid']) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            MyProfileScreen(
-                                          profile: user['data'],
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    Map userData = await fetchUserData(
-                                        _usersList[index]['uid']);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            ProfileScreen(
-                                          profile: userData,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                                splashColor: Colors.transparent,
+                              // Return SearchedUserCard for each user found
+                              return SearchedUserCard(
+                                userEssentialData: _usersList[index],
                               );
                             },
                           )
+                        // Check if username contains at least 2 characters
                         : _searchController.text == '' ||
                                 _searchController.text.length < 2
+                            // Searched username is less than 2 characters
+                            // Show _searchText Text
                             ? Container(
-                                child: Text(
-                                  _searchText,
-                                  style: GoogleFonts.alata(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                  color: Color(0xff1E1E1E),
-                                ),
+                                child: Text(_searchText),
                                 margin: EdgeInsets.only(
                                   left: _marginSize,
                                   right: _marginSize,
@@ -312,125 +214,88 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 padding: const EdgeInsets.all(10),
                               )
+                            // No user was found
                             : Container(
                                 child: Text(
                                   '${_searchController.text} non è su eeloo',
-                                  style: GoogleFonts.alata(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                  color: Color(0xff1E1E1E),
                                 ),
                                 margin: EdgeInsets.only(
                                   left: _marginSize,
                                   right: _marginSize,
                                   top: _marginSize,
                                 ),
-                                padding: const EdgeInsets.all(10),
+                                padding: EdgeInsets.all(_marginSize),
                               )
+                // User search is not active
+                // Fetch user's chats
                 : FutureBuilder(
                     future: fetchChats(_hasToRefresh),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      return (snapshot.connectionState ==
-                              ConnectionState.waiting)
-                          // snapshot is waiting
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xffBC91F8),
-                              ),
-                            )
-                          : RefreshIndicator(
-                              onRefresh: () async {
-                                setState(() {
-                                  _hasToRefresh = true;
-                                });
-                              },
-                              backgroundColor: const Color(0xff2E2E2E),
-                              color: const Color(0xffBC91F8),
-                              child: (snapshot.hasError)
-                                  // snapshot has error
-                                  ? Text(snapshot.error.toString())
-                                  // snapshot has data
-                                  : ListView.builder(
-                                      itemCount: snapshot.data.length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        if (index == 0) {
-                                          bannerAd.load();
-
-                                          return Column(
-                                            children: [
-                                              Container(
-                                                child: AdWidget(
-                                                  ad: bannerAd,
-                                                ),
-                                                height: bannerAd.size.height
-                                                    .toDouble(),
-                                                margin: EdgeInsets.only(
-                                                  top: _marginSize,
-                                                ),
-                                                width: bannerAd.size.width
-                                                    .toDouble(),
-                                              ),
-                                              DateTime.now()
-                                                          .difference(DateTime
-                                                              .parse(snapshot
-                                                                          .data[
-                                                                      index]
-                                                                  ['sent_at']))
-                                                          .inHours >
-                                                      24
-                                                  ? ExpiredChatCard(
-                                                      chatData:
-                                                          snapshot.data[index],
-                                                    )
-                                                  : snapshot.data[index]
-                                                              ['sender_uid'] ==
-                                                          user['data']['uid']
-                                                      ? UserRepliedCard(
-                                                          chatData: snapshot
-                                                              .data![index],
-                                                        )
-                                                      : UserHasToReplyCard(
-                                                          chatData: snapshot
-                                                              .data![index],
-                                                        ),
-                                            ],
-                                          );
-                                        }
-                                        if (DateTime.now()
-                                                .difference(DateTime.parse(
-                                                    snapshot.data[index]
-                                                        ['sent_at']))
-                                                .inHours >
-                                            24) {
-                                          // chat is expired
-                                          return ExpiredChatCard(
-                                            chatData: snapshot.data[index],
-                                          );
-                                        } else if (snapshot.data[index]
-                                                ['sender_uid'] ==
-                                            user['data']['uid']) {
-                                          // user replied last
-                                          return UserRepliedCard(
-                                            chatData: snapshot.data![index],
-                                          );
-                                        } else {
-                                          // user has to reply
-                                          return UserHasToReplyCard(
-                                            chatData: snapshot.data![index],
-                                          );
-                                        }
-                                      },
-                                    ),
-                            );
+                      // Check if Future has completed
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            setState(() {
+                              _hasToRefresh = true;
+                            });
+                          },
+                          // Check if snapshot has error
+                          child: (snapshot.hasError)
+                              // Snapshot has error
+                              // Snapshot's error Text
+                              ? Text(snapshot.error.toString())
+                              // Snapshot has data
+                              // Chats ListViewBuilder
+                              : ListView.builder(
+                                  itemCount: snapshot.data.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    // Check if chat is active or expired
+                                    if (snapshot.data[index]
+                                        ['is_chat_expired']) {
+                                      // Chat is expired
+                                      return ExpiredChatCard(
+                                        chatData: snapshot.data[index],
+                                      );
+                                    } else {
+                                      // Chat is active
+                                      if (snapshot.data[index]['sender_uid'] ==
+                                          user['data']['uid']) {
+                                        // User is sender
+                                        return UserRepliedCard(
+                                          chatData: snapshot.data![index],
+                                        );
+                                      } else {
+                                        // User is recipient
+                                        return UserHasToReplyCard(
+                                          chatData: snapshot.data![index],
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                        );
+                      }
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
                     },
                   ),
           ),
-          floatingActionButton: _isSearching ? null : const StartChatButton(),
+          floatingActionButton: _isSearchingUser
+              // User search is active
+              ? null
+              // User search is not active
+              : ElevatedButton(
+                  child: const Text('inizia una nuova chat'),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          const NewChatScreen(recipientUsername: ''),
+                    ),
+                  ),
+                ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
         ),
