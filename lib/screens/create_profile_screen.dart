@@ -202,18 +202,19 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           RegExp("[a-z0-9_]"),
                         ),
                       ],
-                      maxLength: 20,
+                      maxLength: 30,
                       maxLines: 1,
                     ),
                     // Full name TextField
                     TextField(
-                        controller: _fullNameController,
-                        decoration: const InputDecoration(
-                          hintText: 'full name',
-                        ),
-                        keyboardType: TextInputType.name,
-                        maxLength: 50,
-                        maxLines: 1),
+                      controller: _fullNameController,
+                      decoration: const InputDecoration(
+                        hintText: 'full name',
+                      ),
+                      keyboardType: TextInputType.name,
+                      maxLength: 50,
+                      maxLines: 1,
+                    ),
                     // Bio TextField
                     TextField(
                       controller: _bioController,
