@@ -10,7 +10,6 @@ import 'package:eeloo/screens/sign_in_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // notification arrives when app is in background
 Future<void> backgroundHanlder(RemoteMessage message) async {
@@ -21,8 +20,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   LocalNotificationService.initialize();
-
-  MobileAds.instance.initialize();
 
   await Firebase.initializeApp();
 
