@@ -15,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:eeloo/data/data.dart';
 import 'package:eeloo/screens/create_profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -360,227 +361,347 @@ class _SignInScreenState extends State<SignInScreen> {
     return Scaffold(
       body: GestureDetector(
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                // Email TextField
-                TextField(
+          child: Column(
+            children: [
+              // Spacer
+              const Spacer(),
+              // Title Text
+              GradientText(
+                'eeloo',
+                colors: const [
+                  Color(0xffBC91F8),
+                  Color(0xff63d7c6),
+                ],
+                style: GoogleFonts.alata(
+                  fontSize: 64,
+                ),
+              ),
+              // Spacer
+              const Spacer(),
+              // Email TextField
+              Container(
+                child: TextField(
+                  autocorrect: false,
                   controller: _emailController,
-                  decoration: const InputDecoration(
+                  cursorColor: const Color(0xffBC91F8),
+                  decoration: InputDecoration(
+                    // Make all borders transparent
+                    border: const UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    errorBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    disabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    focusedErrorBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    counterText: '',
                     hintText: 'email',
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                // Password TextField
-                TextField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(
-                    hintText: 'password',
-                  ),
-                  keyboardType: TextInputType.visiblePassword,
-                ),
-                // Sign-up ElevatedButton
-                ElevatedButton(
-                  child: const Text('registrati'),
-                  onPressed: () {
-                    // Sign-up user
-                    _signUp(
-                      _emailController.text,
-                      _passwordController.text,
-                      context,
-                    );
-                  },
-                ),
-                // Sign-in ElevatedButton
-                ElevatedButton(
-                  child: const Text('accedi'),
-                  onPressed: () {
-                    // Sign-in user
-                    _signIn(
-                      _emailController.text,
-                      _passwordController.text,
-                      context,
-                    );
-                  },
-                ),
-                TextButton(
-                  child: Text(
-                    'hai dimenticato la password?',
-                    style: GoogleFonts.alata(
+                    hintStyle: GoogleFonts.alata(
                       color: Colors.grey,
-                      decoration: TextDecoration.underline,
+                      fontSize: 17,
                     ),
                   ),
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          actions: <TextButton>[
-                            TextButton(
-                              child: Text(
-                                'annulla',
-                                style: GoogleFonts.alata(
-                                  color: const Color(0xffBC91F8),
-                                  fontSize: 17,
-                                ),
-                              ),
-                              onPressed: () => Navigator.pop(context),
-                              style: ButtonStyle(
-                                overlayColor: MaterialStateColor.resolveWith(
-                                    (states) => Colors.transparent),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(' '),
+                  ],
+                  keyboardType: TextInputType.emailAddress,
+                  maxLength: 100,
+                  style: GoogleFonts.alata(
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
+                ),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Color(0xff1E1E1E),
+                ),
+                margin: EdgeInsets.only(
+                  top: _marginSize * 2,
+                  left: _marginSize * 2,
+                  right: _marginSize * 2,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+              ),
+              // Password TextField
+              Container(
+                child: TextField(
+                  autocorrect: false,
+                  controller: _passwordController,
+                  cursorColor: const Color(0xffBC91F8),
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    // Make all borders transparent
+                    border: const UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    errorBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    disabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    focusedErrorBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    counterText: '',
+                    hintText: 'password',
+                    hintStyle: GoogleFonts.alata(
+                      color: Colors.grey,
+                      fontSize: 17,
+                    ),
+                  ),
+                  keyboardType: TextInputType.visiblePassword,
+                  maxLength: 100,
+                  style: GoogleFonts.alata(
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
+                ),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Color(0xff1E1E1E),
+                ),
+                margin: EdgeInsets.only(
+                  top: _marginSize,
+                  left: _marginSize * 2,
+                  right: _marginSize * 2,
+                  bottom: _marginSize,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+              ),
+              // Sign-up ElevatedButton
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    child: const Text('registrati'),
+                    onPressed: () {
+                      // Sign-up user
+                      _signUp(
+                        _emailController.text,
+                        _passwordController.text,
+                        context,
+                      );
+                    },
+                  ),
+                  // Sign-in ElevatedButton
+                  ElevatedButton(
+                    child: const Text('accedi'),
+                    onPressed: () {
+                      // Sign-in user
+                      _signIn(
+                        _emailController.text,
+                        _passwordController.text,
+                        context,
+                      );
+                    },
+                  ),
+                ],
+              ),
+              // Spacer
+              const Spacer(),
+              // PasswordReset TextButton
+              TextButton(
+                child: Text(
+                  'hai dimenticato la password?',
+                  style: GoogleFonts.alata(
+                    color: Colors.grey,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        actions: <TextButton>[
+                          TextButton(
+                            child: Text(
+                              'annulla',
+                              style: GoogleFonts.alata(
+                                color: const Color(0xffBC91F8),
+                                fontSize: 17,
                               ),
                             ),
-                            TextButton(
-                              child: Text(
-                                'reimposta password',
-                                style: GoogleFonts.alata(
-                                  color: const Color(0xffBC91F8),
-                                  fontSize: 17,
-                                ),
+                            onPressed: () => Navigator.pop(context),
+                            style: ButtonStyle(
+                              overlayColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.transparent),
+                            ),
+                          ),
+                          TextButton(
+                            child: Text(
+                              'reimposta password',
+                              style: GoogleFonts.alata(
+                                color: const Color(0xffBC91F8),
+                                fontSize: 17,
                               ),
-                              onPressed: () async {
-                                try {
-                                  // validate email
-                                  bool isEmailValid = EmailValidator.validate(
-                                      _resetEmailController.text);
+                            ),
+                            onPressed: () async {
+                              try {
+                                // validate email
+                                bool isEmailValid = EmailValidator.validate(
+                                    _resetEmailController.text);
 
-                                  if (isEmailValid) {
-                                    // email is valid
+                                if (isEmailValid) {
+                                  // email is valid
 
-                                    await FirebaseAuth.instance
-                                        .sendPasswordResetEmail(
-                                      email: _resetEmailController.text,
-                                    );
-
-                                    // show error dialog
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return const CustomAlertDialog(
-                                          dialogTitle: 'fatto!',
-                                          dialogBody:
-                                              'controlla la tua casella di '
-                                              'posta per continuare',
-                                        );
-                                      },
-                                    ).then((value) => Navigator.pop(context));
-                                  } else {
-                                    // email is not valid
-
-                                    // show error dialog
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return const CustomAlertDialog(
-                                          dialogTitle: 'errore!',
-                                          dialogBody:
-                                              'l\'email inserita non è valida',
-                                        );
-                                      },
-                                    );
-                                  }
-                                } on FirebaseAuthException catch (e) {
-                                  // unknown error
+                                  await FirebaseAuth.instance
+                                      .sendPasswordResetEmail(
+                                    email: _resetEmailController.text,
+                                  );
 
                                   // show error dialog
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
-                                      return CustomAlertDialog(
-                                        dialogTitle: 'errore sconosciuto!',
-                                        dialogBody: e.toString(),
+                                      return const CustomAlertDialog(
+                                        dialogTitle: 'fatto!',
+                                        dialogBody:
+                                            'controlla la tua casella di '
+                                            'posta per continuare',
+                                      );
+                                    },
+                                  ).then((value) => Navigator.pop(context));
+                                } else {
+                                  // email is not valid
+
+                                  // show error dialog
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return const CustomAlertDialog(
+                                        dialogTitle: 'errore!',
+                                        dialogBody:
+                                            'l\'email inserita non è valida',
                                       );
                                     },
                                   );
                                 }
-                              },
-                              style: ButtonStyle(
-                                overlayColor: MaterialStateColor.resolveWith(
-                                    (states) => Colors.transparent),
+                              } on FirebaseAuthException catch (e) {
+                                // unknown error
+
+                                // show error dialog
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return CustomAlertDialog(
+                                      dialogTitle: 'errore sconosciuto!',
+                                      dialogBody: e.toString(),
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                            style: ButtonStyle(
+                              overlayColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.transparent),
+                            ),
+                          ),
+                        ],
+                        backgroundColor: const Color(0xff2E2E2E),
+                        content: Column(
+                          children: [
+                            Text(
+                              'se hai dimenticato la tua password, puoi '
+                              'crearne una nuova.\ninserisci la tua email: '
+                              'riceverai un messeggio con le istruzioni per '
+                              'proseguire.',
+                              style: GoogleFonts.alata(
+                                color: Colors.grey,
                               ),
                             ),
-                          ],
-                          backgroundColor: const Color(0xff2E2E2E),
-                          content: Column(
-                            children: [
-                              Text(
-                                'se hai dimenticato la tua password, puoi '
-                                'crearne una nuova.\ninserisci la tua email: '
-                                'riceverai un messeggio con le istruzioni per '
-                                'proseguire.',
-                                style: GoogleFonts.alata(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              Container(
-                                child: TextField(
-                                  autocorrect: false,
-                                  controller: _resetEmailController,
-                                  cursorColor: const Color(0xffBC91F8),
-                                  decoration: InputDecoration(
-                                    border: const UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.transparent,
-                                      ),
-                                    ),
-                                    contentPadding: EdgeInsets.zero,
-                                    counterText: '',
-                                    enabledBorder: const UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.transparent),
-                                    ),
-                                    focusedBorder: const UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.transparent),
-                                    ),
-                                    hintText: 'email',
-                                    hintStyle: GoogleFonts.alata(
-                                      color: Colors.grey,
-                                      fontSize: 17,
+                            Container(
+                              child: TextField(
+                                autocorrect: false,
+                                controller: _resetEmailController,
+                                cursorColor: const Color(0xffBC91F8),
+                                decoration: InputDecoration(
+                                  border: const UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
                                     ),
                                   ),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.deny(' '),
-                                  ],
-                                  keyboardType: TextInputType.emailAddress,
-                                  maxLength: 100,
-                                  style: GoogleFonts.alata(
-                                    color: Colors.white,
+                                  contentPadding: EdgeInsets.zero,
+                                  counterText: '',
+                                  enabledBorder: const UnderlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                  ),
+                                  focusedBorder: const UnderlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                  ),
+                                  hintText: 'email',
+                                  hintStyle: GoogleFonts.alata(
+                                    color: Colors.grey,
                                     fontSize: 17,
                                   ),
                                 ),
-                                decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                  color: Color(0xff1E1E1E),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.deny(' '),
+                                ],
+                                keyboardType: TextInputType.emailAddress,
+                                maxLength: 100,
+                                style: GoogleFonts.alata(
+                                  color: Colors.white,
+                                  fontSize: 17,
                                 ),
-                                margin: EdgeInsets.only(
-                                  top: _marginSize * 2,
-                                ),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
                               ),
-                            ],
-                            mainAxisSize: MainAxisSize.min,
-                          ),
-                          title: Text(
-                            'reimposta la tua password',
-                            style: GoogleFonts.alata(
-                              color: Colors.white,
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                color: Color(0xff1E1E1E),
+                              ),
+                              margin: EdgeInsets.only(
+                                top: _marginSize * 2,
+                              ),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
                             ),
+                          ],
+                          mainAxisSize: MainAxisSize.min,
+                        ),
+                        title: Text(
+                          'reimposta la tua password',
+                          style: GoogleFonts.alata(
+                            color: Colors.white,
                           ),
-                        );
-                      },
-                    );
-                  },
-                  style: ButtonStyle(
-                    overlayColor: MaterialStateColor.resolveWith(
-                        (states) => Colors.transparent),
-                  ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                style: ButtonStyle(
+                  overlayColor: MaterialStateColor.resolveWith(
+                      (states) => Colors.transparent),
                 ),
-              ],
-            ),
+              ),
+              // Spacer
+              const Spacer(),
+            ],
           ),
         ),
         onTap: () {
